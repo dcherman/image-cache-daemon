@@ -1,0 +1,15 @@
+FROM golang as builder
+
+WORKDIR /go/src/github.com/dcherman/image-cache-daemon
+
+COPY warden ./warden
+COPY Makefile .
+
+RUN make bin/warden
+
+FROM alpine
+
+COPY --from=builder /go/src/github.com/dcherman/image-cache-daemon/bin/warden /warden
+COPY ./warden/entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT [ "/entrypoint.sh" ]
