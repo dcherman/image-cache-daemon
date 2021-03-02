@@ -9,6 +9,12 @@ time can be a significant contributor to slow pod start times.  The image cache 
 mitigate that by discovering images to pull from a variety of sources, then pulling those images on each node before they're
 actually needed.
 
+## Installation
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/dcherman/image-cache-daemon/master/manifests/install.yaml -n image-cache-daemon
+```
+
 ```
 image-cache-daemon [flags]
 ```
