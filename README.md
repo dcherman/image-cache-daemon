@@ -22,15 +22,15 @@ image-cache-daemon [flags]
 ### Options
 
 ```
-  -h, --help                               help for image-cache-daemon
-      --image stringArray                  Images that should be pre-fetched
-      --node-name string                   The node name to pull to
-      --pod-name string                    The pod name
-      --pod-namespace string               The namespace this pod is running in
-      --pod-uid string                     The owning pod UID
-      --resync-period duration             How often the daemon should re-pull images from all of the sources.  Set to 0 to disable. (default 15m0s)
-      --warden-image string                The image that copies a binary to pulled containers to replace the entrypoint (default "exiges/image-cache-warden:latest")
-      --watch-cluster-workflow-templates   Whether or not to watch cluster workflow templates (default true)
-      --watch-cron-workflows               Whether or not to watch cron workflows (default true)
-      --watch-workflow-templates           Whether or not to watch workflow templates (default true)
+  -h, --help                                    help for image-cache-daemon
+      --image stringArray                       Images that should be pre-fetched
+      --node-name string                        The node name to pull to
+      --pod-name string                         The pod name
+      --pod-namespace string                    The namespace this pod is running in
+      --pod-uid string                          The owning pod UID
+      --resync-period duration                  How often the daemon should re-pull images from all of the sources.  Set to 0 to disable. (default 15m0s)
+      --warden-image string                     The image that copies a binary to pulled containers to replace the entrypoint (default "exiges/image-cache-warden:latest")
+      --watch-argo-cluster-workflow-templates   Whether or not to watch cluster workflow templates (default true)
+      --watch-argo-cron-workflows               Whether or not to watch cron workflows (default true)
+      --watch-argo-workflow-templates           Whether or not to watch workflow templates (default true)
 ```

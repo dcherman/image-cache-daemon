@@ -50,11 +50,11 @@ func NewImageCacheDaemonCommand() *cobra.Command {
 		podUUID      string
 		podNamespace string
 
-		wardenImage                   string
-		watchWorkflowTemplates        bool
-		watchClusterWorkflowTemplates bool
-		watchCronWorkflows            bool
-		resyncPeriod                  time.Duration
+		wardenImage                       string
+		watchArgoWorkflowTemplates        bool
+		watchArgoClusterWorkflowTemplates bool
+		watchArgoCronWorkflows            bool
+		resyncPeriod                      time.Duration
 	)
 
 	var rootCmd = &cobra.Command{
@@ -104,7 +104,7 @@ func NewImageCacheDaemonCommand() *cobra.Command {
 				go staticSource.Run(ctx)
 			}
 
-			if watchWorkflowTemplates {
+			if watchArgoWorkflowTemplates {
 				logrus.Info("watching workflow templates for images to pull")
 
 				workflowTemplateSource := source.NewWorkflowTemplateSource(argoclient, resyncPeriod)
@@ -112,14 +112,14 @@ func NewImageCacheDaemonCommand() *cobra.Command {
 				go workflowTemplateSource.Run(ctx)
 			}
 
-			if watchClusterWorkflowTemplates {
+			if watchArgoClusterWorkflowTemplates {
 				logrus.Info("watching cluster workflow templates for images to pull")
 				workflowTemplateSource := source.NewClusterWorkflowTemplateSource(argoclient, resyncPeriod)
 				ip.AddSource(ctx, workflowTemplateSource)
 				go workflowTemplateSource.Run(ctx)
 			}
 
-			if watchCronWorkflows {
+			if watchArgoCronWorkflows {
 				logrus.Info("watching cron workflows for images to pull")
 				workflowTemplateSource := source.NewCronWorkflowTemplateSource(argoclient, resyncPeriod)
 				ip.AddSource(ctx, workflowTemplateSource)
@@ -147,9 +147,9 @@ func NewImageCacheDaemonCommand() *cobra.Command {
 	rootCmd.Flags().StringVar(&podUUID, "pod-uid", os.Getenv("POD_UUD"), "The owning pod UID")
 	rootCmd.Flags().StringVar(&podNamespace, "pod-namespace", os.Getenv("POD_NAMESPACE"), "The namespace this pod is running in")
 	rootCmd.Flags().StringVar(&wardenImage, "warden-image", "exiges/image-cache-warden:latest", "The image that copies a binary to pulled containers to replace the entrypoint")
-	rootCmd.Flags().BoolVar(&watchWorkflowTemplates, "watch-workflow-templates", true, "Whether or not to watch workflow templates")
-	rootCmd.Flags().BoolVar(&watchClusterWorkflowTemplates, "watch-cluster-workflow-templates", true, "Whether or not to watch cluster workflow templates")
-	rootCmd.Flags().BoolVar(&watchCronWorkflows, "watch-cron-workflows", true, "Whether or not to watch cron workflows")
+	rootCmd.Flags().BoolVar(&watchArgoWorkflowTemplates, "watch-argo-workflow-templates", true, "Whether or not to watch workflow templates")
+	rootCmd.Flags().BoolVar(&watchArgoClusterWorkflowTemplates, "watch-argo-cluster-workflow-templates", true, "Whether or not to watch cluster workflow templates")
+	rootCmd.Flags().BoolVar(&watchArgoCronWorkflows, "watch-argo-cron-workflows", true, "Whether or not to watch cron workflows")
 	rootCmd.Flags().DurationVar(&resyncPeriod, "resync-period", time.Minute*15, "How often the daemon should re-pull images from all of the sources.  Set to 0 to disable.")
 
 	return rootCmd
