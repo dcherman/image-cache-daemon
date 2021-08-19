@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: image-cache-daemon
+spec:
+  selector:
+    matchLabels:
+      app: image-cache-daemon
+  template:
+    metadata:
+      labels:
+        app: image-cache-daemon
+    spec:
+      serviceAccountName: image-cache-daemon
+      containers:
+      - name: image-cache-daemon
+        image: exiges/image-cache-daemon:latest
+        imagePullPolicy: Always
+        env:
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: POD_UID
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.uid
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: image-cache-daemon
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: image-cache-daemon-cluster-role
+rules:
+  - apiGroups:
+      - argoproj.io
+    resources:
+      - workflowtemplates
+      - cronworkflows
+      - clusterworkflowtemplates
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: image-cache-daemon-cluster-role-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: image-cache-daemon-cluster-role
+subjects:
+  - kind: ServiceAccount
+    name: image-cache-daemon
+    namespace: image-cache-daemon
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: image-cache-daemon-role
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+      - delete
+      - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: image-cache-daemon-role-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: image-cache-daemon-role
+subjects:
+- kind: ServiceAccount
+  name: image-cache-daemon

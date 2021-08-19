@@ -1,0 +1,25 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch: {}
+
+jobs:
+  e2e:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: nolar/setup-k3d-k3s@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - run: kubectl create ns argo
+      - run: kubectl apply -n argo -f https://raw.githubusercontent.com/argoproj/argo-workflows/stable/manifests/quick-start-minimal.yaml
+      - run: docker build -f Dockerfile -t image-cache-daemon:ci .
+      - run: docker build -f Dockerfile.warden -t warden:ci .
+      - run: k3d image import image-cache-daemon:ci
+      - run: k3d image import warden:ci
+      - run: kubectl apply -k manifests/ci
