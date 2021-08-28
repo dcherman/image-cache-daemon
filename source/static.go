@@ -34,6 +34,8 @@ func (sis *StaticImageSource) Run(ctx context.Context) {
 
 		sis.clock.Sleep(sis.resyncPeriod)
 	}
+
+	close(sis.imageCh)
 }
 
 func NewStaticImageSource(images []string, resyncPeriod time.Duration) ImageSource {

@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	argov1alpha1 "github.com/argoproj/argo/pkg/apis/workflow/v1alpha1"
-	argoclientset "github.com/argoproj/argo/pkg/client/clientset/versioned"
-	argoinformers "github.com/argoproj/argo/pkg/client/informers/externalversions"
+	argov1alpha1 "github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
+	argoclientset "github.com/argoproj/argo-workflows/v3/pkg/client/clientset/versioned"
+	argoinformers "github.com/argoproj/argo-workflows/v3/pkg/client/informers/externalversions"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -34,13 +34,12 @@ func (t *ClusterWorkflowTemplateSource) Run(ctx context.Context) {
 	}
 
 	inf.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: handleWorkflowTemplateChange,
-		UpdateFunc: func(_, obj interface{}) {
-			handleWorkflowTemplateChange(obj)
-		},
+		AddFunc:    handleWorkflowTemplateChange,
+		UpdateFunc: skipOldObject(handleWorkflowTemplateChange),
 	})
 
 	inf.Run(ctx.Done())
+	close(t.imageCh)
 }
 
 func NewClusterWorkflowTemplateSource(client argoclientset.Interface, resyncPeriod time.Duration) ImageSource {

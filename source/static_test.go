@@ -25,24 +25,12 @@ func Test_StaticImageSource(t *testing.T) {
 
 	go staticSource.Run(ctx)
 
-	wg := sync.WaitGroup{}
-	wg.Add(3)
-
 	var emitted []string
 
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case image := <-src.ImageCh():
-				emitted = append(emitted, image)
-				wg.Done()
-			}
-		}
-	}()
+	for image := range src.ImageCh() {
+		emitted = append(emitted, image)
+	}
 
-	wg.Wait()
 	time.Sleep(time.Millisecond * 10)
 	assert.ElementsMatch(t, emitted, []string{"foo", "bar", "baz"})
 }

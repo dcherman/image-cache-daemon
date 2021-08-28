@@ -43,7 +43,11 @@ func (ip *ImagePuller) AddSource(ctx context.Context, src source.ImageSource) {
 			select {
 			case <-ctx.Done():
 				return
-			case image := <-imageCh:
+			case image, ok := <-imageCh:
+				if !ok {
+					return
+				}
+
 				logrus.WithFields(logrus.Fields{
 					"image":  image,
 					"source": src.Name(),

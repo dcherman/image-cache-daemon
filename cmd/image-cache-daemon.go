@@ -29,7 +29,7 @@ import (
 	"syscall"
 	"time"
 
-	argoclientset "github.com/argoproj/argo/pkg/client/clientset/versioned"
+	argoclientset "github.com/argoproj/argo-workflows/v3/pkg/client/clientset/versioned"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -44,16 +44,18 @@ import (
 
 func NewImageCacheDaemonCommand() *cobra.Command {
 	var (
-		images       []string
-		nodeName     string
-		podName      string
-		podUUID      string
-		podNamespace string
+		images            []string
+		configmapSelector string
+		nodeName          string
+		podName           string
+		podUUID           string
+		podNamespace      string
 
 		wardenImage                       string
 		watchArgoWorkflowTemplates        bool
 		watchArgoClusterWorkflowTemplates bool
 		watchArgoCronWorkflows            bool
+		watchConfigMaps                   bool
 		resyncPeriod                      time.Duration
 	)
 
@@ -126,6 +128,13 @@ func NewImageCacheDaemonCommand() *cobra.Command {
 				go workflowTemplateSource.Run(ctx)
 			}
 
+			if watchConfigMaps {
+				logrus.Info("watching configmaps for images to pull")
+				configmapSource := source.NewConfigMapSource(kubeclient, resyncPeriod, source.WithConfigMapSelector(configmapSelector))
+				ip.AddSource(ctx, configmapSource)
+				go configmapSource.Run(ctx)
+			}
+
 			go ip.Run(ctx)
 
 			stopCh := make(chan os.Signal, 1)
@@ -147,9 +156,11 @@ func NewImageCacheDaemonCommand() *cobra.Command {
 	rootCmd.Flags().StringVar(&podUUID, "pod-uid", os.Getenv("POD_UUD"), "The owning pod UID")
 	rootCmd.Flags().StringVar(&podNamespace, "pod-namespace", os.Getenv("POD_NAMESPACE"), "The namespace this pod is running in")
 	rootCmd.Flags().StringVar(&wardenImage, "warden-image", "exiges/image-cache-warden:latest", "The image that copies a binary to pulled containers to replace the entrypoint")
+	rootCmd.Flags().StringVar(&configmapSelector, "configmap-selector", "app.kubernetes.io/part-of=image-cache-daemon", "The selector to use when monitoring for ConfigMap sources")
 	rootCmd.Flags().BoolVar(&watchArgoWorkflowTemplates, "watch-argo-workflow-templates", true, "Whether or not to watch workflow templates")
 	rootCmd.Flags().BoolVar(&watchArgoClusterWorkflowTemplates, "watch-argo-cluster-workflow-templates", true, "Whether or not to watch cluster workflow templates")
 	rootCmd.Flags().BoolVar(&watchArgoCronWorkflows, "watch-argo-cron-workflows", true, "Whether or not to watch cron workflows")
+	rootCmd.Flags().BoolVar(&watchConfigMaps, "watch-configmaps", true, "Whether or not to watch ConfigMaps for images to pull.  Must match the --config-map-selector")
 	rootCmd.Flags().DurationVar(&resyncPeriod, "resync-period", time.Minute*15, "How often the daemon should re-pull images from all of the sources.  Set to 0 to disable.")
 
 	return rootCmd
