@@ -1,7 +1,7 @@
 package source
 
 import (
-	argov1alpha1 "github.com/argoproj/argo/pkg/apis/workflow/v1alpha1"
+	argov1alpha1 "github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
 )
 
 func emitImagesFromTemplatesToChan(templates []argov1alpha1.Template, ch chan<- string) {
@@ -19,5 +19,11 @@ func emitImagesFromTemplatesToChan(templates []argov1alpha1.Template, ch chan<- 
 
 	for image := range images {
 		ch <- image
+	}
+}
+
+func skipOldObject(fn func(interface{})) func(interface{}, interface{}) {
+	return func(_ interface{}, obj interface{}) {
+		fn(obj)
 	}
 }

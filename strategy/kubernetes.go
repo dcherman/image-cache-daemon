@@ -106,8 +106,8 @@ func getImageFromPod(pod *coreapiv1.Pod) string {
 	return ""
 }
 
-func (kpps *KubernetesPodPullStrategy) cleanupPod(pod *coreapiv1.Pod) error {
-	return kpps.Client.CoreV1().Pods(pod.Namespace).Delete(pod.Name, &v1.DeleteOptions{})
+func (kpps *KubernetesPodPullStrategy) cleanupPod(ctx context.Context, pod *coreapiv1.Pod) error {
+	return kpps.Client.CoreV1().Pods(pod.Namespace).Delete(ctx, pod.Name, v1.DeleteOptions{})
 }
 
 func (kpps *KubernetesPodPullStrategy) handlePodEvent(ctx context.Context, pod *coreapiv1.Pod) {
@@ -128,7 +128,7 @@ func (kpps *KubernetesPodPullStrategy) handlePodEvent(ctx context.Context, pod *
 		l.Fatal("pull neither failed nor succeeded, this should be impossible")
 	}
 
-	if err := kpps.cleanupPod(pod); err != nil {
+	if err := kpps.cleanupPod(ctx, pod); err != nil {
 		l.Errorf("failed to delete pod: %v", err)
 	} else {
 		l.Infof("pod deleted")
@@ -163,8 +163,8 @@ func (kpps *KubernetesPodPullStrategy) MonitorPods(ctx context.Context) {
 	informer.Run(ctx.Done())
 }
 
-func (kpps *KubernetesPodPullStrategy) PullImage(_ context.Context, image string) error {
-	createdPod, err := kpps.Client.CoreV1().Pods(kpps.Namespace).Create(&coreapiv1.Pod{
+func (kpps *KubernetesPodPullStrategy) PullImage(ctx context.Context, image string) error {
+	createdPod, err := kpps.Client.CoreV1().Pods(kpps.Namespace).Create(ctx, &coreapiv1.Pod{
 		ObjectMeta: v1.ObjectMeta{
 			GenerateName: kpps.PodName + "-",
 			Namespace:    kpps.Namespace,
@@ -234,7 +234,7 @@ func (kpps *KubernetesPodPullStrategy) PullImage(_ context.Context, image string
 			Tolerations:   []coreapiv1.Toleration{},
 			RestartPolicy: coreapiv1.RestartPolicyNever,
 		},
-	})
+	}, v1.CreateOptions{})
 
 	if err != nil {
 		return err
