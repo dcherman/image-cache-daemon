@@ -39,12 +39,33 @@ image-cache-daemon [flags]
 
 ## Sources
 
+### Static
+
+If you have a known set of images that you want to pull, you can do so via providing the `--image` argument to the cache daemon.  This argument may be provided multiple times.
+
+```bash
+./image-cache-daemon --image=alpine --image=debian
+```
+
+### Argo Workflow Templates
+
+Watch the cluster for [Argo Workflow](https://github.com/argoproj/argo-workflows) templates and cache images found in any of those templates.  Enabled by default, can be controlled by passing `--watch-argo-workflow-templates`
+
+### Argo Workflow Cluster Workflow Templates
+
+Watch the cluster for [Argo Workflow](https://github.com/argoproj/argo-workflows) cluster workflow templates and cache images found in any of those templates.  Enabled by default, can be controlled by passing `--watch-argo-cluster-workflow-templates`
+
+### Argo Workflow CronJob Templates
+
+Watch the cluster for [Argo Workflow](https://github.com/argoproj/argo-workflows) cron templates and cache images found in any of those templates.  Enabled by default, can be controlled by passing `--watch-argo-cron-workflows`
+
+
 ### ConfigMap
 
 The ConfigMap source is useful when you want to separate the list of images that you're pulling from the installation of the cache daemon.  It's also useful if you have a dynamic list
 of images to pull that aren't part of one of the other sources.
 
-By default, all ConfigMaps that match the label selector `"app.kubernetes.io/part-of=image-cache-daemon"` will be considered as a source for the cache daemon in any namespace that it has privileges to read.  If you would like to restrict the set of ConfigMaps that it reads, you can so do by changing the selector, or restricting the namespaces that the cache daemon can read via RBAC.
+By default, all ConfigMaps that match the label selector `"app.kubernetes.io/part-of=image-cache-daemon"` will be considered as a source for the cache daemon in any namespace that it has privileges to read.  If you would like to restrict the set of ConfigMaps that it reads, you can so do by changing the selector (`--configmap-selector`), or restricting the namespaces that the cache daemon can read via RBAC.  Enabled by default, can be controlled by `--watch-configmaps`
 
 Example Usage:
 
