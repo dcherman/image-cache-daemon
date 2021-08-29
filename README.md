@@ -1,5 +1,7 @@
 ## image-cache-daemon
 
+[![CI](https://github.com/dcherman/image-cache-daemon/actions/workflows/ci.yml/badge.svg)](https://github.com/dcherman/image-cache-daemon/actions/workflows/ci.yml)
+
 Image Cache Daemon is a service to pre-pull / cache images on Kubernetes before they're needed
 
 ### Synopsis
