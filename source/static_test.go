@@ -33,6 +33,12 @@ func Test_StaticImageSource(t *testing.T) {
 
 	time.Sleep(time.Millisecond * 10)
 	assert.ElementsMatch(t, emitted, []string{"foo", "bar", "baz"})
+	assert.ElementsMatch(t, src.Images(), []string{"foo", "bar", "baz"})
+}
+
+func Test_StaticImageSource_Name(t *testing.T) {
+	src := NewStaticImageSource([]string{}, 0)
+	assert.Equal(t, src.Name(), "static")
 }
 
 func Test_StaticImageSourceWithResync(t *testing.T) {

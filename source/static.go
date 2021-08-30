@@ -22,6 +22,10 @@ func (sis *StaticImageSource) ImageCh() <-chan string {
 	return sis.imageCh
 }
 
+func (sis *StaticImageSource) Images() []string {
+	return sis.images
+}
+
 func (sis *StaticImageSource) Run(ctx context.Context) {
 	for {
 		for _, i := range sis.images {
