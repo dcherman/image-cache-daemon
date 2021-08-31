@@ -95,8 +95,6 @@ func (t *ArgoTemplateSource) getImagesFromInformer() map[string]bool {
 		}
 	}
 
-	t.informer.HasSynced()
-
 	return imageMap
 }
 
