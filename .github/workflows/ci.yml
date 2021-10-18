@@ -48,7 +48,7 @@ jobs:
         platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/386
         tags: |
           ghcr.io/dcherman/image-cache-daemon-warden:latest
-          ghcr.io/dcherman/image-cache-daemon-warden:${{ env.GITHUB_SHA }}
+          ghcr.io/dcherman/image-cache-daemon-warden:${{env.GITHUB_SHA}}
         cache-from: type=gha
         cache-to: type=gha,mode=max
     - name: Build Image Cache Daemon Image
@@ -59,7 +59,7 @@ jobs:
         platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/386
         tags: |
           ghcr.io/dcherman/image-cache-daemon:latest
-          ghcr.io/dcherman/image-cache-daemon:${{ env.GITHUB_SHA }}
+          ghcr.io/dcherman/image-cache-daemon:${{env.GITHUB_SHA}}
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
@@ -73,6 +73,7 @@ jobs:
     - uses: nolar/setup-k3d-k3s@v1
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Build Warden Image
       uses: docker/build-push-action@v2
       with:
@@ -82,6 +83,7 @@ jobs:
           ghcr.io/dcherman/image-cache-daemon-warden:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
+
     - name: Build Image Cache Daemon Image
       uses: docker/build-push-action@v2
       with:
@@ -91,6 +93,9 @@ jobs:
           ghcr.io/dcherman/image-cache-daemon:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
+
+    - run: k3d image import ghcr.io/dcherman/image-cache-daemon:latest
+    - run: k3d image import ghcr.io/dcherman/image-cache-daemon-warden:latest
 
   lint:
     runs-on: ubuntu-latest
