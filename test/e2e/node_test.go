@@ -17,13 +17,9 @@ func runCommandWithOutput(command string, args ...string) error {
 	return cmd.Run()
 }
 
-func runK3dCommand() error {
-	cmd := exec.Command("k3d")
-
-	return cmd.Run()
-}
-
 func TestImageCaching(t *testing.T) {
+	t.SkipNow()
+
 	err := runCommandWithOutput("k3d", "cluster", "create", "foobar", "--no-lb")
 
 	if !assert.NoError(t, err) {
