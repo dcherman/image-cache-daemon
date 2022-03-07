@@ -6,7 +6,7 @@ lint: $(GOPATH)/bin/golangci-lint
 
 .PHONY: bin/image-cache-daemon
 bin/image-cache-daemon:
-	GO_ENABLED=0 go build -ldflags="-w -s" -o bin/image-cache-daemon main.go
+	CGO_ENABLED=0 go build -ldflags="-w -s" -o bin/image-cache-daemon main.go
 
 bin/warden: warden/warden.c
 	mkdir -p bin
