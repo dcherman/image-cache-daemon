@@ -1,0 +1,10 @@
+images:
+  - name: exiges/image-cache-daemon
+    newName: image-cache-daemon
+    newTag: ci
+
+resources:
+  - ../base
+
+patchesStrategicMerge:
+  - ds.yaml
